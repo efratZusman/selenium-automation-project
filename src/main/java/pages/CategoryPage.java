@@ -7,8 +7,9 @@ public class CategoryPage extends BasePage  {
 
     public CategoryPage(WebDriver d){ super(d); }
 
+    private By firstProduct = By.cssSelector(".item-root-2AI:nth-of-type(1) a.item-name-1cZ");
+
     public void openFirstProduct() {
-        By firstProduct = By.cssSelector(".item.product.product-item:first-of-type a");
         click(firstProduct);
     }
 

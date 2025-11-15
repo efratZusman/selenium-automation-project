@@ -8,27 +8,48 @@ import java.time.Duration;
 public class BasePage {
     protected WebDriver driver;
     protected WebDriverWait wait;
+
     public BasePage(WebDriver driver){
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
-    protected WebElement waitForElement(By by){
-        return wait.until(ExpectedConditions.visibilityOfElementLocated(by));
+
+    protected WebElement waitAndScroll(By by){
+        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(by));
+
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block:'center', behavior:'instant'});",
+                el
+        );
+
+        return wait.until(ExpectedConditions.visibilityOf(el));
     }
-    protected void click(By by){
-        waitForElement(by).click();
+
+    protected void click(By by) {
+        WebElement element = waitAndScroll(by);
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".mask-root_active-17w")));
+        } catch (TimeoutException e) {
+        }
+
+        try {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+        }
     }
+
+
     protected void type(By by, String text){
-        WebElement el = waitForElement(by);
+        WebElement el = waitAndScroll(by);
         el.clear();
         el.sendKeys(text);
     }
+
     protected String getText(By by){
-        return waitForElement(by).getText();
+        return waitAndScroll(by).getText();
     }
-//    public void takeScreenshot(String path){
-//        TakesScreenshot ts = (TakesScreenshot) driver;
-//        File src = ts.getScreenshotAs(OutputType.FILE);
-//        src.renameTo(new File(path));
-//    }
 }
+

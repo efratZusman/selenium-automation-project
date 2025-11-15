@@ -1,5 +1,6 @@
 package tests;
 
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.io.FileHandler;
@@ -34,10 +35,10 @@ public class CartFlowTest extends BaseTest {
 
         // =====================
         // פריט 1: קטגוריה A
-        home.openCategoryByName("שרשראות");
+        home.openCategoryByHref("/televisions");
         category.openFirstProduct();
         String name1 = product.getName();
-        double price1 = Double.parseDouble(product.getPrice().replace("₪","").replace(",",""));
+        double price1 = Double.parseDouble(product.getPrice());
         product.setQuantity(1);
         product.addToCart();
         Thread.sleep(1500);
@@ -49,10 +50,10 @@ public class CartFlowTest extends BaseTest {
         // =====================
         // פריט 2: קטגוריה B
         driver.navigate().back();
-        home.openCategoryByName("עגילים");
+        home.openCategoryByHref("/refrigerators-freezers");
         category.openFirstProduct();
         String name2 = product.getName();
-        double price2 = Double.parseDouble(product.getPrice().replace("₪","").replace(",",""));
+        double price2 = Double.parseDouble(product.getPrice());
         product.setQuantity(2);
         product.addToCart();
         Thread.sleep(1500);
@@ -63,10 +64,10 @@ public class CartFlowTest extends BaseTest {
         // =====================
         // פריט 3: קטגוריה C
         driver.navigate().back();
-        home.openCategoryByName("צמידים");
+        home.openCategoryByHref("/cookware-bakeware");
         category.openFirstProduct();
         String name3 = product.getName();
-        double price3 = Double.parseDouble(product.getPrice().replace("₪","").replace(",",""));
+        double price3 = Double.parseDouble(product.getPrice());
         product.setQuantity(1);
         product.addToCart();
         Thread.sleep(1500);
@@ -124,8 +125,20 @@ public class CartFlowTest extends BaseTest {
     }
 
     // פונקציה לצילום מסך
-    private void takeScreenshot(String filePath) throws Exception {
-        File src = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-        FileHandler.copy(src, new File(filePath));
+    public void takeScreenshot(String name) {
+        try {
+            File dir = new File("screens");
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File destFile = new File(dir, name + ".png");
+            FileUtils.copyFile(scrFile, destFile);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 }

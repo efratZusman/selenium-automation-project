@@ -20,8 +20,10 @@ public class BaseTest {
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
-        driver.get("https://www.magnolia.co.il/");
+        driver.get("https://www.alm.co.il/");
+
     }
+
 
     @AfterMethod
     public void tearDown() {

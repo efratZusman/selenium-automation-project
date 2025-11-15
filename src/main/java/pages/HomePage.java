@@ -6,11 +6,10 @@ public class HomePage extends BasePage {
 
     public HomePage(WebDriver d){ super(d); }
 
-    By cartLink = By.cssSelector("a.action.showcart");
+    By cartLink = By.cssSelector(".cartTrigger-triggerContainer-2Jd.hidden.items-center.h-lg.lg_grid");
 
-
-    public void openCategoryByName(String name){
-        By catLink = By.cssSelector("a[title='" + name + "']");
+    public void openCategoryByHref(String hrefFragment){
+        By catLink = By.cssSelector("a[href*='" + hrefFragment + "']");
         click(catLink);
     }
 
