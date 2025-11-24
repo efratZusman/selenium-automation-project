@@ -3,13 +3,13 @@ package tests;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.io.FileHandler;
 import org.testng.annotations.Test;
 import pages.CartPage;
 import pages.CategoryPage;
 import pages.HomePage;
 import pages.ProductPage;
 import utils.ExcelWriter;
+import org.openqa.selenium.WebDriver;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -24,75 +24,73 @@ public class CartFlowTest extends BaseTest {
     @Test
     public void addThreeItemsAndVerifyCart() throws Exception {
         HomePage home = new HomePage(driver);
-        ProductPage product = new ProductPage(driver);
         CategoryPage category = new CategoryPage(driver);
         CartPage cart = new CartPage(driver);
 
         List<Map<String, String>> results = new ArrayList<>();
-
-        // פורמט לתמונת מסך עם תאריך ושעה
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
         // =====================
         // פריט 1: קטגוריה A
         home.openCategoryByHref("/televisions");
         category.openFirstProduct();
-        String name1 = product.getName();
-        double price1 = Double.parseDouble(product.getPrice());
-        product.setQuantity(1);
-        product.addToCart();
-        Thread.sleep(1500);
-
-        // צילום מסך
+        ProductPage product1 = new ProductPage(driver);
+        product1.waitForProductPageReady();
+        product1.setQuantity(1);
+        product1.addToCart();
+        Thread.sleep(2000);
         String screen1 = "screens/step1_" + dtf.format(LocalDateTime.now()) + ".png";
         takeScreenshot(screen1);
+        String name1 = product1.getName();
+        double price1 = Double.parseDouble(product1.getPrice());
 
         // =====================
         // פריט 2: קטגוריה B
-        driver.navigate().back();
-        home.openCategoryByHref("/refrigerators-freezers");
+        home.openCategoryByHref("/household-electronics");
         category.openFirstProduct();
-        String name2 = product.getName();
-        double price2 = Double.parseDouble(product.getPrice());
-        product.setQuantity(2);
-        product.addToCart();
-        Thread.sleep(1500);
-
+        ProductPage product2 = new ProductPage(driver);
+        product2.waitForProductPageReady();
+        product2.setQuantity(2);
+        product2.addToCart();
+        Thread.sleep(2000);
         String screen2 = "screens/step2_" + dtf.format(LocalDateTime.now()) + ".png";
         takeScreenshot(screen2);
+        String name2 = product2.getName();
+        double price2 = Double.parseDouble(product2.getPrice());
 
         // =====================
         // פריט 3: קטגוריה C
-        driver.navigate().back();
         home.openCategoryByHref("/cookware-bakeware");
         category.openFirstProduct();
-        String name3 = product.getName();
-        double price3 = Double.parseDouble(product.getPrice());
-        product.setQuantity(1);
-        product.addToCart();
+        ProductPage product3 = new ProductPage(driver);
+        product3.waitForProductPageReady();
+        product3.setQuantity(1);
+        product3.addToCart();
         Thread.sleep(1500);
-
         String screen3 = "screens/step3_" + dtf.format(LocalDateTime.now()) + ".png";
         takeScreenshot(screen3);
+        String name3 = product3.getName();
+        double price3 = Double.parseDouble(product3.getPrice());
 
         // =====================
         // פתיחת העגלה ובדיקת פריטים
         home.goToCart();
         Thread.sleep(2000);
 
-        // חישוב מחיר שורה
         double row1Price = price1 * 1;
         double row2Price = price2 * 2;
         double row3Price = price3 * 1;
 
-        // בדיקת subtotal
         double subtotal = cart.getSubtotal();
+        int amount = cart.getCartQuantity();
         double calculatedSubtotal = row1Price + row2Price + row3Price;
 
         assert subtotal > 0 : "Subtotal לא גדול מאפס";
         assert subtotal <= calculatedSubtotal : "Subtotal גבוה מהמחושב - יתכן מבצע";
+        assert amount == 3 : "כמות המוצרים לא תואמת";
 
-        // הוספה ל־Excel
+        // =====================
+        // שמירה ל-Excel
         Map<String, String> rowMap1 = new HashMap<>();
         rowMap1.put("ProductName", name1);
         rowMap1.put("UnitPrice", String.valueOf(price1));
@@ -124,21 +122,15 @@ public class CartFlowTest extends BaseTest {
         ExcelWriter.writeCartResults("output/cart_results.xlsx", results);
     }
 
-    // פונקציה לצילום מסך
     public void takeScreenshot(String name) {
         try {
             File dir = new File("screens");
-            if (!dir.exists()) {
-                dir.mkdirs();
-            }
-
+            if (!dir.exists()) dir.mkdirs();
             File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File destFile = new File(dir, name + ".png");
             FileUtils.copyFile(scrFile, destFile);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 }

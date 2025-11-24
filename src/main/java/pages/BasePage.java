@@ -14,16 +14,17 @@ public class BasePage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    protected WebElement waitAndScroll(By by){
-        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(by));
-
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].scrollIntoView({block:'center', behavior:'instant'});",
-                el
-        );
-
-        return wait.until(ExpectedConditions.visibilityOf(el));
-    }
+//    protected WebElement waitAndScroll(By by){
+//        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(by));
+//
+//        ((JavascriptExecutor) driver).executeScript(
+//                "arguments[0].scrollIntoView({block:'center', behavior:'instant'});",
+//                el
+//        );
+//
+//        return wait.until(ExpectedConditions.visibilityOf(el));
+//    }
+//
 
     protected void click(By by) {
         WebElement element = waitAndScroll(by);
@@ -42,14 +43,48 @@ public class BasePage {
     }
 
 
-    protected void type(By by, String text){
-        WebElement el = waitAndScroll(by);
-        el.clear();
-        el.sendKeys(text);
-    }
+//    protected void type(By by, String text){
+//        WebElement el = waitAndScroll(by);
+//        el.clear();
+//        el.sendKeys(text);
+//    }
 
     protected String getText(By by){
         return waitAndScroll(by).getText();
     }
+
+    protected void type(By by, String text) {
+        waitForOverlayToDisappear();
+
+        WebElement el = waitAndScroll(by);
+
+        try {
+            el.clear();
+            el.sendKeys(text);
+        } catch (Exception e) {
+            ((JavascriptExecutor) driver)
+                    .executeScript("arguments[0].value = arguments[1];", el, text);
+        }
+    }
+
+    protected WebElement waitAndScroll(By by){
+        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(by));
+
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block:'center', behavior:'instant'});",
+                el
+        );
+
+        return wait.until(ExpectedConditions.visibilityOf(el));
+    }
+
+    protected void waitForOverlayToDisappear() {
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                    By.cssSelector(".mask-root_active-17w")
+            ));
+        } catch (TimeoutException ignore) {}
+    }
+
 }
 

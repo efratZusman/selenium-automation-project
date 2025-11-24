@@ -6,19 +6,27 @@ import org.openqa.selenium.WebElement;
 
 public class CartPage extends BasePage {
     public CartPage(WebDriver d){ super(d); }
-    private By cartRows = By.cssSelector(".cart-item, .cart-row");
-    private By subtotal = By.cssSelector(".cart-subtotal, .subtotal");
 
-    public int getNumberOfRows(){
-        List<WebElement> rows = driver.findElements(cartRows);
-        return rows.size();
+    private By subtotal = By.cssSelector(".priceSummary-totalPrice-2Y9");
+    private By cartQuantity = By.cssSelector("h2.miniCart-quantity-N3D");
+
+    public int getCartQuantity() {
+        String text = driver.findElement(cartQuantity).getText();
+        // חיפוש המספר בתוך הסוגריים
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("\\((\\d+)\\)").matcher(text);
+        if (m.find()) {
+            return Integer.parseInt(m.group(1));
+        } else {
+            return 0;
+        }
     }
 
     public double getSubtotal(){
-        String s = getText(subtotal).replaceAll("[^0-9.,]","").replace(",",".");
+        String s = getText(subtotal)
+                .replaceAll("[^0-9.,]", "")
+                .replace(",", ".");
         return Double.parseDouble(s);
     }
 
-    // לקרוא את פרטי כל שורה: שם/qty/price
-    public List<WebElement> getRows(){ return driver.findElements(cartRows); }
 }
+
