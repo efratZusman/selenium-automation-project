@@ -9,6 +9,8 @@ import pages.HomePage;
 import pages.ProductPage;
 import pages.ShippingFormPage;
 
+import java.time.LocalDateTime;
+
 public class RegistrationFormTest extends BaseTest {
 
     // --------------------------------------------------------
@@ -16,14 +18,15 @@ public class RegistrationFormTest extends BaseTest {
     // --------------------------------------------------------
     private ShippingFormPage navigateToForm() {
         HomePage home = new HomePage(driver);
-//        CategoryPage category = new CategoryPage(driver);
+        CategoryPage category = new CategoryPage(driver);
 
-        home.openCategoryByHref("/checkout");
-//        category.openFirstProduct();
+        home.openCategoryByHref("/tele");
 
-//        ProductPage product = new ProductPage(driver);
-//        product.waitForProductPageReady();
-//        product.buyNow();
+        category.openFirstProduct();
+
+        ProductPage product = new ProductPage(driver);
+        product.waitForProductPageReady();
+        product.buyNow();
 
         return new ShippingFormPage(driver);
     }
@@ -43,6 +46,9 @@ public class RegistrationFormTest extends BaseTest {
         form.fillHouseNumber("12");
 
         form.submitForm();
+
+        String screen1 = "screens/test3_/step1_" + dtf.format(LocalDateTime.now()) + ".png";
+        takeScreenshot(screen1);
 
         Assert.assertTrue(form.hasErrorForField("firstname"), "שדה שם פרטי לא הציג שגיאת חובה");
     }
@@ -66,6 +72,9 @@ public class RegistrationFormTest extends BaseTest {
 
         form.submitForm();
 
+        String screen2 = "screens/test3_/step2_" + dtf.format(LocalDateTime.now()) + ".png";
+        takeScreenshot(screen2);
+
         Assert.assertTrue(form.hasErrorForField("email"), "לא הופיעה שגיאה על אימייל לא תקין");
     }
 
@@ -77,6 +86,9 @@ public class RegistrationFormTest extends BaseTest {
         ShippingFormPage form = navigateToForm();
 
         form.fillPhone("abc123!!");
+
+        String screen3 = "screens/test3_/step3_" + dtf.format(LocalDateTime.now()) + ".png";
+        takeScreenshot(screen3);
 
         String value = driver.findElement(By.cssSelector("input#telephone")).getAttribute("value");
         Assert.assertTrue(value.matches("\\d+"), "שדה טלפון לא מסנן תווים שאינם ספרות");
@@ -91,6 +103,9 @@ public class RegistrationFormTest extends BaseTest {
 
         WebElement submit = driver.findElement(By.cssSelector("button[type='submit']"));
         boolean disabled = !submit.isEnabled();
+
+        String screen4 = "screens/test3_/step4_" + dtf.format(LocalDateTime.now()) + ".png";
+        takeScreenshot(screen4);
 
         Assert.assertTrue(disabled, "כפתור שליחה לא חסום כשהשדות ריקים");
     }

@@ -19,7 +19,6 @@ public class DynamicContentPage extends BasePage {
         click(eilatButton);
     }
 
-    // המתנה עד שהכותרת של "אילת" תופיע
     public void waitForEilatTitle() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(eilatTitle));
     }

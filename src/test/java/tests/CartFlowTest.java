@@ -28,7 +28,6 @@ public class CartFlowTest extends BaseTest {
         CartPage cart = new CartPage(driver);
 
         List<Map<String, String>> results = new ArrayList<>();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
         // =====================
         // פריט 1: קטגוריה A
@@ -39,7 +38,7 @@ public class CartFlowTest extends BaseTest {
         product1.setQuantity(1);
         product1.addToCart();
         Thread.sleep(2000);
-        String screen1 = "screens/step1_" + dtf.format(LocalDateTime.now()) + ".png";
+        String screen1 = "screens/test1_/step1_" + dtf.format(LocalDateTime.now()) + ".png";
         takeScreenshot(screen1);
         String name1 = product1.getName();
         double price1 = Double.parseDouble(product1.getPrice());
@@ -53,7 +52,7 @@ public class CartFlowTest extends BaseTest {
         product2.setQuantity(2);
         product2.addToCart();
         Thread.sleep(2000);
-        String screen2 = "screens/step2_" + dtf.format(LocalDateTime.now()) + ".png";
+        String screen2 = "screens/test1_/step2_" + dtf.format(LocalDateTime.now()) + ".png";
         takeScreenshot(screen2);
         String name2 = product2.getName();
         double price2 = Double.parseDouble(product2.getPrice());
@@ -67,7 +66,7 @@ public class CartFlowTest extends BaseTest {
         product3.setQuantity(1);
         product3.addToCart();
         Thread.sleep(1500);
-        String screen3 = "screens/step3_" + dtf.format(LocalDateTime.now()) + ".png";
+        String screen3 = "screens/test1_/step3_" + dtf.format(LocalDateTime.now()) + ".png";
         takeScreenshot(screen3);
         String name3 = product3.getName();
         double price3 = Double.parseDouble(product3.getPrice());
@@ -122,15 +121,4 @@ public class CartFlowTest extends BaseTest {
         ExcelWriter.writeCartResults("output/cart_results.xlsx", results);
     }
 
-    public void takeScreenshot(String name) {
-        try {
-            File dir = new File("screens");
-            if (!dir.exists()) dir.mkdirs();
-            File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            File destFile = new File(dir, name + ".png");
-            FileUtils.copyFile(scrFile, destFile);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }
