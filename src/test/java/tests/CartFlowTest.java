@@ -1,19 +1,12 @@
 package tests;
 
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.CartPage;
 import pages.CategoryPage;
 import pages.HomePage;
 import pages.ProductPage;
 import utils.ExcelWriter;
-import org.openqa.selenium.WebDriver;
-
-import java.io.File;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,8 +20,6 @@ public class CartFlowTest extends BaseTest {
         CategoryPage category = new CategoryPage(driver);
         CartPage cart = new CartPage(driver);
 
-        List<Map<String, String>> results = new ArrayList<>();
-
         // =====================
         // פריט 1: קטגוריה A
         home.openCategoryByHref("/televisions");
@@ -37,11 +28,14 @@ public class CartFlowTest extends BaseTest {
         product1.waitForProductPageReady();
         product1.setQuantity(1);
         product1.addToCart();
-        Thread.sleep(2000);
-        String screen1 = "screens/test1_/step1_" + dtf.format(LocalDateTime.now()) + ".png";
-        takeScreenshot(screen1);
+        home.waitForCartLoaded();
+
+        String screen1 = takeScreenshot("test1_cart_flow", "step1");
+//
+//        String screen1 = "screens/test1_/step1_" + dtf.format(LocalDateTime.now()) + ".png";
+//        takeScreenshot(screen1);
         String name1 = product1.getName();
-        double price1 = Double.parseDouble(product1.getPrice());
+        double price1 = product1.getPrice();
 
         // =====================
         // פריט 2: קטגוריה B
@@ -51,11 +45,14 @@ public class CartFlowTest extends BaseTest {
         product2.waitForProductPageReady();
         product2.setQuantity(2);
         product2.addToCart();
-        Thread.sleep(2000);
-        String screen2 = "screens/test1_/step2_" + dtf.format(LocalDateTime.now()) + ".png";
-        takeScreenshot(screen2);
+        home.waitForCartLoaded();
+
+        String screen2 = takeScreenshot("test1_cart_flow", "step2");
+//
+//        String screen2 = "screens/test1_/step2_" + dtf.format(LocalDateTime.now()) + ".png";
+//        takeScreenshot(screen2);
         String name2 = product2.getName();
-        double price2 = Double.parseDouble(product2.getPrice());
+        double price2 = product2.getPrice();
 
         // =====================
         // פריט 3: קטגוריה C
@@ -65,16 +62,20 @@ public class CartFlowTest extends BaseTest {
         product3.waitForProductPageReady();
         product3.setQuantity(1);
         product3.addToCart();
-        Thread.sleep(1500);
-        String screen3 = "screens/test1_/step3_" + dtf.format(LocalDateTime.now()) + ".png";
-        takeScreenshot(screen3);
+        home.waitForCartLoaded();
+
+        String screen3 = takeScreenshot("test1_cart_flow", "step3");
+//
+//        String screen3 = "screens/test1_/step3_" + dtf.format(LocalDateTime.now()) + ".png";
+//        takeScreenshot(screen3);
         String name3 = product3.getName();
-        double price3 = Double.parseDouble(product3.getPrice());
+        double price3 = product3.getPrice();
 
         // =====================
         // פתיחת העגלה ובדיקת פריטים
         home.goToCart();
-        Thread.sleep(2000);
+        home.waitForCartLoaded();
+//        Thread.sleep(1500);
 
         double row1Price = price1 * 1;
         double row2Price = price2 * 2;
@@ -84,12 +85,14 @@ public class CartFlowTest extends BaseTest {
         int amount = cart.getCartQuantity();
         double calculatedSubtotal = row1Price + row2Price + row3Price;
 
-        assert subtotal > 0 : "Subtotal לא גדול מאפס";
-        assert subtotal <= calculatedSubtotal : "Subtotal גבוה מהמחושב - יתכן מבצע";
-        assert amount == 3 : "כמות המוצרים לא תואמת";
+        Assert.assertTrue(subtotal > 0, "Subtotal לא גדול מאפס");
+        Assert.assertEquals(amount, 3, "הכמות בעגלה לא תואמת");
+        Assert.assertEquals(subtotal, calculatedSubtotal, 0.01, "Subtotal לא תואם לחישוב");
 
-        // =====================
-        // שמירה ל-Excel
+// =====================
+// בניית רשימת מוצרים ל-Excel
+        List<Map<String, String>> results = new ArrayList<>();
+
         Map<String, String> rowMap1 = new HashMap<>();
         rowMap1.put("ProductName", name1);
         rowMap1.put("UnitPrice", String.valueOf(price1));
@@ -97,6 +100,7 @@ public class CartFlowTest extends BaseTest {
         rowMap1.put("RowPrice", String.valueOf(row1Price));
         rowMap1.put("Status", "PASS");
         rowMap1.put("Screenshot", screen1);
+        results.add(rowMap1);
 
         Map<String, String> rowMap2 = new HashMap<>();
         rowMap2.put("ProductName", name2);
@@ -105,6 +109,7 @@ public class CartFlowTest extends BaseTest {
         rowMap2.put("RowPrice", String.valueOf(row2Price));
         rowMap2.put("Status", "PASS");
         rowMap2.put("Screenshot", screen2);
+        results.add(rowMap2);
 
         Map<String, String> rowMap3 = new HashMap<>();
         rowMap3.put("ProductName", name3);
@@ -113,12 +118,28 @@ public class CartFlowTest extends BaseTest {
         rowMap3.put("RowPrice", String.valueOf(row3Price));
         rowMap3.put("Status", "PASS");
         rowMap3.put("Screenshot", screen3);
-
-        results.add(rowMap1);
-        results.add(rowMap2);
         results.add(rowMap3);
 
-        ExcelWriter.writeCartResults("output/cart_results.xlsx", results);
+// =====================
+// חישוב סכומים
+        double expectedTotal = row1Price + row2Price + row3Price;
+        double actualTotal = cart.getSubtotal();
+
+        String finalStatus =
+                Math.abs(expectedTotal - actualTotal) < 0.01 ? "PASS" : "FAIL";
+
+        String finalScreenshot =
+                takeScreenshot("test1_cart_flow", "final_total");
+
+        ExcelWriter.writeCartResults(
+                "output/cart_results.xlsx",
+                results,
+                expectedTotal,
+                actualTotal,
+                finalStatus,
+                finalScreenshot
+        );
+
     }
 
 }

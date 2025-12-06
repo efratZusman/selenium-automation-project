@@ -1,6 +1,7 @@
 package pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -20,7 +21,6 @@ public class ShippingFormPage extends BasePage {
     private final By floorNumber = By.cssSelector("input#floor_number");
     private final By apartmentNumber = By.cssSelector("input#apartment_number");
     private final By submitButton = By.cssSelector("button[type='submit']");
-    private final By nextPageTitle = By.cssSelector("h3.shippingInformation-editTitle-3Ng");
 
     public void fillFirstName(String txt) { type(firstName, txt); }
     public void fillLastName(String txt) { type(lastName, txt); }
@@ -33,20 +33,39 @@ public class ShippingFormPage extends BasePage {
 
     // עיר – כי זה AutoComplete
     public void fillCity(String txt) {
-        type(city, txt);
+        type(city, txt + Keys.ENTER);
     }
 
     public void submitForm() {
         click(submitButton);
     }
 
-    public boolean isNextPageDisplayed() {
-        try {
-            return driver.findElement(nextPageTitle).isDisplayed();
-        } catch (Exception e){
-            return false;
-        }
+    public boolean isSubmitEnabled() {
+        return driver.findElement(submitButton).isEnabled();
     }
+
+
+//    public boolean isNextPageDisplayed() {
+//        try {
+//            return driver.findElement(nextPageTitle).isDisplayed();
+//        } catch (Exception e){
+//            return false;
+//        }
+//    }
+
+
+    public void fillValidBaseData() {
+        fillFirstName("John");
+        fillLastName("Doe");
+        fillEmail("john@example.com");
+        fillPhone("0501234567");
+        fillStreet("ירמיהו");
+        fillCity("ירושלים");
+        fillFloor("5");
+        fillHouseNumber("12");
+        fillApartment("17");
+    }
+
 
     // ========================
     // Error validation

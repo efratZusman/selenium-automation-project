@@ -6,7 +6,14 @@ import java.util.*;
 
 public class ExcelWriter {
 
-    public static void writeCartResults(String filePath, List<Map<String,String>> rows) throws Exception{
+    public static void writeCartResults(
+            String filePath,
+            List<Map<String, String>> productRows,
+            double expectedTotal,
+            double actualTotal,
+            String finalStatus,
+            String finalScreenshot
+    ) throws IOException {
 
         File file = new File(filePath);
 
@@ -18,8 +25,7 @@ public class ExcelWriter {
 
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
-            boolean created = parentDir.mkdirs();
-            if (!created) {
+            if (!parentDir.mkdirs()) {
                 throw new IOException("Failed to create directory: " + parentDir.getAbsolutePath());
             }
         }
@@ -29,17 +35,22 @@ public class ExcelWriter {
 
             XSSFSheet sheet = workbook.createSheet("CartResults");
 
-            // כותרות
-            String[] heads = {"ProductName","UnitPrice","Quantity","RowPrice","Status","Screenshot"};
-            XSSFRow header = sheet.createRow(0);
-            for (int i = 0; i < heads.length; i++) {
-                header.createCell(i).setCellValue(heads[i]);
+            // =======================
+            // כותרות מוצרים
+            String[] productHeaders = {
+                    "ProductName", "UnitPrice", "Quantity", "RowPrice", "Status", "Screenshot"
+            };
+
+            XSSFRow headerRow = sheet.createRow(0);
+            for (int i = 0; i < productHeaders.length; i++) {
+                headerRow.createCell(i).setCellValue(productHeaders[i]);
             }
 
-            // שורות עם נתונים
-            int r = 1;
-            for (Map<String, String> map : rows) {
-                XSSFRow row = sheet.createRow(r++);
+            // =======================
+            // שורות מוצרים
+            int rowIndex = 1;
+            for (Map<String, String> map : productRows) {
+                XSSFRow row = sheet.createRow(rowIndex++);
                 row.createCell(0).setCellValue(map.getOrDefault("ProductName", ""));
                 row.createCell(1).setCellValue(map.getOrDefault("UnitPrice", ""));
                 row.createCell(2).setCellValue(map.getOrDefault("Quantity", ""));
@@ -48,8 +59,29 @@ public class ExcelWriter {
                 row.createCell(5).setCellValue(map.getOrDefault("Screenshot", ""));
             }
 
+            // =======================
+            // שורת רווח
+            rowIndex++;
+
+            // =======================
+            // כותרות סיכום
+            XSSFRow summaryHeader = sheet.createRow(rowIndex++);
+            summaryHeader.createCell(0).setCellValue("ExpectedTotal");
+            summaryHeader.createCell(1).setCellValue("ActualTotal");
+            summaryHeader.createCell(2).setCellValue("FinalStatus");
+            summaryHeader.createCell(3).setCellValue("FinalScreenshot");
+
+            // =======================
+            // נתוני סיכום
+            XSSFRow summaryRow = sheet.createRow(rowIndex);
+            summaryRow.createCell(0).setCellValue(expectedTotal);
+            summaryRow.createCell(1).setCellValue(actualTotal);
+            summaryRow.createCell(2).setCellValue(finalStatus);
+            summaryRow.createCell(3).setCellValue(finalScreenshot);
+
+            // =======================
             // התאמת רוחב עמודות
-            for (int i = 0; i < heads.length; i++) {
+            for (int i = 0; i < 10; i++) {
                 sheet.autoSizeColumn(i);
             }
 

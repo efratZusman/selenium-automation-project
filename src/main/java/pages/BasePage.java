@@ -1,8 +1,7 @@
 package pages;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.*;
-
-import java.io.File;
 import java.time.Duration;
 
 public class BasePage {
@@ -11,29 +10,32 @@ public class BasePage {
 
     public BasePage(WebDriver driver){
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-//    protected WebElement waitAndScroll(By by){
-//        WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(by));
-//
-//        ((JavascriptExecutor) driver).executeScript(
-//                "arguments[0].scrollIntoView({block:'center', behavior:'instant'});",
-//                el
-//        );
-//
-//        return wait.until(ExpectedConditions.visibilityOf(el));
-//    }
-//
+    protected void closeFlashyPopupIfPresent() {
+        try {
+            WebElement popup = driver.findElement(
+                    By.cssSelector("flashy-popup dialog[open]")
+            );
+
+            if (popup.isDisplayed()) {
+                WebElement closeBtn = popup.findElement(
+                        By.cssSelector(".close-on-click")
+                );
+
+                closeBtn.click();
+
+                wait.until(ExpectedConditions.invisibilityOf(popup));
+            }
+        } catch (NoSuchElementException | TimeoutException ignore) {
+        }
+    }
 
     protected void click(By by) {
-        WebElement element = waitAndScroll(by);
+        closeFlashyPopupIfPresent();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        try {
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".mask-root_active-17w")));
-        } catch (TimeoutException e) {
-        }
+        WebElement element = waitAndScroll(by);
 
         try {
             element.click();
@@ -42,19 +44,12 @@ public class BasePage {
         }
     }
 
-
-//    protected void type(By by, String text){
-//        WebElement el = waitAndScroll(by);
-//        el.clear();
-//        el.sendKeys(text);
-//    }
-
     protected String getText(By by){
         return waitAndScroll(by).getText();
     }
 
     protected void type(By by, String text) {
-        waitForOverlayToDisappear();
+        closeFlashyPopupIfPresent();
 
         WebElement el = waitAndScroll(by);
 
@@ -78,13 +73,11 @@ public class BasePage {
         return wait.until(ExpectedConditions.visibilityOf(el));
     }
 
-    protected void waitForOverlayToDisappear() {
-        try {
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(
-                    By.cssSelector(".mask-root_active-17w")
-            ));
-        } catch (TimeoutException ignore) {}
-    }
-
+//    protected void waitForOverlayToDisappear() {
+//        try {
+//            wait.until(ExpectedConditions.invisibilityOfElementLocated(
+//                    By.cssSelector(".mask-root_active-17w")
+//            ));
+//        } catch (TimeoutException ignore) {}
+//    }
 }
-
