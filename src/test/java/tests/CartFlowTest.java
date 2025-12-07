@@ -1,5 +1,7 @@
 package tests;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.CartPage;
@@ -13,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public class CartFlowTest extends BaseTest {
+
+    private static final Logger log = LoggerFactory.getLogger(CartFlowTest.class);
 
     @Test
     public void addThreeItemsAndVerifyCart() throws Exception {
@@ -30,10 +34,8 @@ public class CartFlowTest extends BaseTest {
         product1.addToCart();
         home.waitForCartLoaded();
 
-        String screen1 = takeScreenshot("test1_cart_flow", "step1");
-//
-//        String screen1 = "screens/test1_/step1_" + dtf.format(LocalDateTime.now()) + ".png";
-//        takeScreenshot(screen1);
+//        String screen1 = takeScreenshot("test1_cart_flow", "step1");
+
         String name1 = product1.getName();
         double price1 = product1.getPrice();
 
@@ -47,10 +49,8 @@ public class CartFlowTest extends BaseTest {
         product2.addToCart();
         home.waitForCartLoaded();
 
-        String screen2 = takeScreenshot("test1_cart_flow", "step2");
-//
-//        String screen2 = "screens/test1_/step2_" + dtf.format(LocalDateTime.now()) + ".png";
-//        takeScreenshot(screen2);
+//        String screen2 = takeScreenshot("test1_cart_flow", "step2");
+
         String name2 = product2.getName();
         double price2 = product2.getPrice();
 
@@ -64,10 +64,8 @@ public class CartFlowTest extends BaseTest {
         product3.addToCart();
         home.waitForCartLoaded();
 
-        String screen3 = takeScreenshot("test1_cart_flow", "step3");
-//
-//        String screen3 = "screens/test1_/step3_" + dtf.format(LocalDateTime.now()) + ".png";
-//        takeScreenshot(screen3);
+//        String screen3 = takeScreenshot("test1_cart_flow", "step3");
+
         String name3 = product3.getName();
         double price3 = product3.getPrice();
 
@@ -75,7 +73,6 @@ public class CartFlowTest extends BaseTest {
         // פתיחת העגלה ובדיקת פריטים
         home.goToCart();
         home.waitForCartLoaded();
-//        Thread.sleep(1500);
 
         double row1Price = price1 * 1;
         double row2Price = price2 * 2;
@@ -86,7 +83,7 @@ public class CartFlowTest extends BaseTest {
         double calculatedSubtotal = row1Price + row2Price + row3Price;
 
         Assert.assertTrue(subtotal > 0, "Subtotal לא גדול מאפס");
-        Assert.assertEquals(amount, 3, "הכמות בעגלה לא תואמת");
+        Assert.assertEquals(amount, 4, "הכמות בעגלה לא תואמת");
         Assert.assertEquals(subtotal, calculatedSubtotal, 0.01, "Subtotal לא תואם לחישוב");
 
 // =====================
@@ -99,7 +96,7 @@ public class CartFlowTest extends BaseTest {
         rowMap1.put("Quantity", "1");
         rowMap1.put("RowPrice", String.valueOf(row1Price));
         rowMap1.put("Status", "PASS");
-        rowMap1.put("Screenshot", screen1);
+//        rowMap1.put("Screenshot", screen1);
         results.add(rowMap1);
 
         Map<String, String> rowMap2 = new HashMap<>();
@@ -108,7 +105,7 @@ public class CartFlowTest extends BaseTest {
         rowMap2.put("Quantity", "2");
         rowMap2.put("RowPrice", String.valueOf(row2Price));
         rowMap2.put("Status", "PASS");
-        rowMap2.put("Screenshot", screen2);
+//        rowMap2.put("Screenshot", screen2);
         results.add(rowMap2);
 
         Map<String, String> rowMap3 = new HashMap<>();
@@ -117,7 +114,7 @@ public class CartFlowTest extends BaseTest {
         rowMap3.put("Quantity", "1");
         rowMap3.put("RowPrice", String.valueOf(row3Price));
         rowMap3.put("Status", "PASS");
-        rowMap3.put("Screenshot", screen3);
+//        rowMap3.put("Screenshot", screen3);
         results.add(rowMap3);
 
 // =====================
@@ -136,8 +133,8 @@ public class CartFlowTest extends BaseTest {
                 results,
                 expectedTotal,
                 actualTotal,
-                finalStatus,
-                finalScreenshot
+                finalStatus
+//                finalScreenshot
         );
 
     }

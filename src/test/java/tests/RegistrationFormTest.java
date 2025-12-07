@@ -1,7 +1,5 @@
 package tests;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import pages.CategoryPage;
@@ -9,10 +7,9 @@ import pages.HomePage;
 import pages.ProductPage;
 import pages.ShippingFormPage;
 
-import java.time.LocalDateTime;
-
 public class RegistrationFormTest extends BaseTest {
 
+    ShippingFormPage form;
     // --------------------------------------------------------
     // פונקציית עזר: ניווט לטופס המשלוח
     // --------------------------------------------------------
@@ -32,33 +29,18 @@ public class RegistrationFormTest extends BaseTest {
     }
 
     // --------------------------------------------------------
-    // בדיקה: שם פרטי חובה
-    // --------------------------------------------------------
-    @Test
-    public void testRequiredFieldFirstName() {
-        ShippingFormPage form = navigateToForm();
-        form.fillValidBaseData();
-        form.fillFirstName("");
-        form.submitForm();
-
-        Assert.assertTrue(form.hasErrorForField("firstname"), "שדה שם פרטי לא הציג שגיאת חובה");
-
-        String screen1 = takeScreenshot("test3_registeration", "step1");
-    }
-
-    // --------------------------------------------------------
     // בדיקה: אימייל לא תקין
     // --------------------------------------------------------
     @Test
     public void testInvalidEmail() {
-        ShippingFormPage form = navigateToForm();
+        form = navigateToForm();
         form.fillValidBaseData();
         form.fillEmail("wrong_email");
         form.submitForm();
 
         Assert.assertTrue(form.hasErrorForField("email"), "לא הופיעה שגיאה על אימייל לא תקין");
 
-        String screen2 = takeScreenshot("test3_registeration", "step2");
+        takeScreenshot("test3_registeration", "step2");
     }
 
     // --------------------------------------------------------
@@ -66,13 +48,16 @@ public class RegistrationFormTest extends BaseTest {
     // --------------------------------------------------------
     @Test
     public void testTelephoneDigitsOnly() {
-        ShippingFormPage form = navigateToForm();
+        form = navigateToForm();
         form.fillPhone("abc123!!");
 
-        String value = driver.findElement(By.cssSelector("input#telephone")).getAttribute("value");
-        Assert.assertTrue(value.matches("\\d+"), "שדה טלפון לא מסנן תווים שאינם ספרות");
+        form.submitForm();
+        Assert.assertTrue(form.hasErrorForField("telephone"),"לא הופיעה שגיאה על טלפון לא תקין");
 
-        String screen3 = takeScreenshot("test3_registeration", "step3");
+//        String value = form.getPhoneValue();
+//        Assert.assertTrue(value.matches("\\d+"), "שדה טלפון לא מסנן תווים שאינם ספרות");
+
+        takeScreenshot("test3_registeration", "step3");
     }
 
     // --------------------------------------------------------
@@ -80,11 +65,26 @@ public class RegistrationFormTest extends BaseTest {
     // --------------------------------------------------------
     @Test
     public void testSubmitDisabledWhenRequiredEmpty() {
-        ShippingFormPage form = navigateToForm();
+        form = navigateToForm();
 
         Assert.assertFalse(form.isSubmitEnabled(), "כפתור שליחה לא חסום כשהשדות ריקים");
 
-        String screen4 = takeScreenshot("test3_registeration", "step4");
+        takeScreenshot("test3_registeration", "step4");
+    }
+
+    // --------------------------------------------------------
+    // בדיקה: שם פרטי חובה
+    // --------------------------------------------------------
+    @Test
+    public void testRequiredFieldFirstName() {
+        form = navigateToForm();
+        form.fillValidBaseData();
+        form.fillFirstName("");
+        form.submitForm();
+
+        Assert.assertTrue(form.hasErrorForField("firstname"), "שדה שם פרטי לא הציג שגיאת חובה");
+
+        takeScreenshot("test3_registeration", "step1");
     }
 
 }

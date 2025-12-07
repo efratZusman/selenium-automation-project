@@ -24,9 +24,9 @@ public class CartPage extends BasePage {
     public double getSubtotal(){
         String s = getText(subtotal)
                 .replaceAll("[^0-9.,]", "")
-                .replace(",", ".");
+                .replace(",", "")
+                .replace(".", "");
         return Double.parseDouble(s);
     }
-
 }
 

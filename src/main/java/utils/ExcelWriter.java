@@ -11,8 +11,8 @@ public class ExcelWriter {
             List<Map<String, String>> productRows,
             double expectedTotal,
             double actualTotal,
-            String finalStatus,
-            String finalScreenshot
+            String finalStatus
+//            String finalScreenshot
     ) throws IOException {
 
         File file = new File(filePath);
@@ -56,7 +56,7 @@ public class ExcelWriter {
                 row.createCell(2).setCellValue(map.getOrDefault("Quantity", ""));
                 row.createCell(3).setCellValue(map.getOrDefault("RowPrice", ""));
                 row.createCell(4).setCellValue(map.getOrDefault("Status", ""));
-                row.createCell(5).setCellValue(map.getOrDefault("Screenshot", ""));
+//                row.createCell(5).setCellValue(map.getOrDefault("Screenshot", ""));
             }
 
             // =======================
@@ -69,7 +69,7 @@ public class ExcelWriter {
             summaryHeader.createCell(0).setCellValue("ExpectedTotal");
             summaryHeader.createCell(1).setCellValue("ActualTotal");
             summaryHeader.createCell(2).setCellValue("FinalStatus");
-            summaryHeader.createCell(3).setCellValue("FinalScreenshot");
+//            summaryHeader.createCell(3).setCellValue("FinalScreenshot");
 
             // =======================
             // נתוני סיכום
@@ -77,7 +77,7 @@ public class ExcelWriter {
             summaryRow.createCell(0).setCellValue(expectedTotal);
             summaryRow.createCell(1).setCellValue(actualTotal);
             summaryRow.createCell(2).setCellValue(finalStatus);
-            summaryRow.createCell(3).setCellValue(finalScreenshot);
+//            summaryRow.createCell(3).setCellValue(finalScreenshot);
 
             // =======================
             // התאמת רוחב עמודות

@@ -5,6 +5,8 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.util.List;
+
 public class ShippingFormPage extends BasePage {
 
     public ShippingFormPage(WebDriver driver) {
@@ -16,7 +18,7 @@ public class ShippingFormPage extends BasePage {
     private final By email = By.cssSelector("input#email");
     private final By phone = By.cssSelector("input#telephone");
     private final By street = By.cssSelector("input#street");
-    private final By city = By.cssSelector("input#react-select-2-input");
+    private final By city = By.cssSelector("div[class*='guestForm-city'] input");
     private final By houseNumber = By.cssSelector("input#house_number");
     private final By floorNumber = By.cssSelector("input#floor_number");
     private final By apartmentNumber = By.cssSelector("input#apartment_number");
@@ -37,22 +39,12 @@ public class ShippingFormPage extends BasePage {
     }
 
     public void submitForm() {
-        click(submitButton);
+        driver.findElement(submitButton).click();
     }
 
     public boolean isSubmitEnabled() {
         return driver.findElement(submitButton).isEnabled();
     }
-
-
-//    public boolean isNextPageDisplayed() {
-//        try {
-//            return driver.findElement(nextPageTitle).isDisplayed();
-//        } catch (Exception e){
-//            return false;
-//        }
-//    }
-
 
     public void fillValidBaseData() {
         fillFirstName("John");
@@ -66,6 +58,9 @@ public class ShippingFormPage extends BasePage {
         fillApartment("17");
     }
 
+    public String getPhoneValue() {
+        return driver.findElement(phone).getAttribute("value");
+    }
 
     // ========================
     // Error validation
@@ -78,18 +73,25 @@ public class ShippingFormPage extends BasePage {
                     "[class^='guestForm-" + fieldName + "'] p[class^='message-root_error']"
             );
 
-            WebElement error = driver.findElement(selector);
+            List<WebElement> errors = driver.findElements(selector);
 
-            String text = error.getText().trim();
-            System.out.println("ERROR for " + fieldName + ": '" + text + "'");
+            for (WebElement error : errors) {
+                String text = error.getText().trim();
+                System.out.println("ERROR for " + fieldName + ": '" + text + "'");
 
-            return !text.isEmpty();
-        }
-        catch (Exception e) {
-            System.out.println("ERROR element for " + fieldName + " NOT FOUND");
+                if (!text.isEmpty()) {
+                    return true;
+                }
+            }
+
+            return false;
+
+        } catch (Exception e) {
+            System.out.println("ERROR elements for " + fieldName + " NOT FOUND");
             return false;
         }
     }
+
 
 
 }

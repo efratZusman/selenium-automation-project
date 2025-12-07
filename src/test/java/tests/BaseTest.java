@@ -42,11 +42,6 @@ public class BaseTest {
         }
     }
 
-//    @AfterMethod
-//    public void cleanUp() {
-//        driver.manage().deleteAllCookies();
-//    }
-
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     public String takeScreenshot(String testName, String stepName) {

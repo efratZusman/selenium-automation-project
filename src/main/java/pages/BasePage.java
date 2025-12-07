@@ -14,22 +14,22 @@ public class BasePage {
     }
 
     protected void closeFlashyPopupIfPresent() {
-        try {
-            WebElement popup = driver.findElement(
-                    By.cssSelector("flashy-popup dialog[open]")
-            );
-
-            if (popup.isDisplayed()) {
-                WebElement closeBtn = popup.findElement(
-                        By.cssSelector(".close-on-click")
-                );
-
-                closeBtn.click();
-
-                wait.until(ExpectedConditions.invisibilityOf(popup));
-            }
-        } catch (NoSuchElementException | TimeoutException ignore) {
-        }
+//        try {
+//            WebElement popup = driver.findElement(
+//                    By.cssSelector("flashy-popup dialog[open]")
+//            );
+//
+//            if (popup.isDisplayed()) {
+//                WebElement closeBtn = popup.findElement(
+//                        By.cssSelector(".close-on-click")
+//                );
+//
+//                closeBtn.click();
+//
+//                wait.until(ExpectedConditions.invisibilityOf(popup));
+//            }
+//        } catch (NoSuchElementException | TimeoutException ignore) {
+//        }
     }
 
     protected void click(By by) {
@@ -54,11 +54,15 @@ public class BasePage {
         WebElement el = waitAndScroll(by);
 
         try {
-            el.clear();
+            el.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+            el.sendKeys(Keys.DELETE);
+
             el.sendKeys(text);
+
         } catch (Exception e) {
-            ((JavascriptExecutor) driver)
-                    .executeScript("arguments[0].value = arguments[1];", el, text);
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            js.executeScript("arguments[0].value='';", el);
+            js.executeScript("arguments[0].value=arguments[1];", el, text);
         }
     }
 
@@ -72,12 +76,4 @@ public class BasePage {
 
         return wait.until(ExpectedConditions.visibilityOf(el));
     }
-
-//    protected void waitForOverlayToDisappear() {
-//        try {
-//            wait.until(ExpectedConditions.invisibilityOfElementLocated(
-//                    By.cssSelector(".mask-root_active-17w")
-//            ));
-//        } catch (TimeoutException ignore) {}
-//    }
 }

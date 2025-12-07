@@ -20,6 +20,6 @@ public class HomePage extends BasePage {
     }
 
     public void waitForCartLoaded() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(cartTable));
+        wait.until(ExpectedConditions.presenceOfElementLocated(cartTable));
     }
 }
