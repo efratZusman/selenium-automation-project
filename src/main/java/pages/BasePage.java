@@ -32,8 +32,27 @@ public class BasePage {
 //        }
     }
 
+    protected void removeWhatsAppShareIfExists() {
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+
+        js.executeScript(
+                "document.querySelectorAll(" +
+                        "'.react-share__ShareButton, " +
+                        "button[aria-label*=\\\"וואצפ\\\"], " +
+                        "button[aria-label*=\\\"whatsapp\\\" i]'" +
+                        ").forEach(function(el){ el.remove(); });"
+        );
+    }
+
+    protected void disableNewTabs() {
+        ((JavascriptExecutor) driver).executeScript(
+                "document.querySelectorAll('a[target=_blank]').forEach(a => a.removeAttribute('target'));"
+        );
+    }
+
     protected void click(By by) {
         closeFlashyPopupIfPresent();
+        removeWhatsAppShareIfExists();
 
         WebElement element = waitAndScroll(by);
 
@@ -67,6 +86,9 @@ public class BasePage {
     }
 
     protected WebElement waitAndScroll(By by){
+        disableNewTabs();
+        removeWhatsAppShareIfExists();
+
         WebElement el = wait.until(ExpectedConditions.presenceOfElementLocated(by));
 
         ((JavascriptExecutor) driver).executeScript(

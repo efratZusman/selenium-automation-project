@@ -21,7 +21,13 @@ public class ProductPage extends BasePage {
     public String getName(){ return getText(productName); }
 
     public void setQuantity(int q) {
-        type(quantityInput, String.valueOf(q) + Keys.ENTER);
+        type(quantityInput, String.valueOf(q));
+
+        wait.until(ExpectedConditions.attributeToBe(
+                quantityInput,
+                "value",
+                String.valueOf(q)
+        ));
     }
 
     public void addToCart() {

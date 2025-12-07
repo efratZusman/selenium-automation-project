@@ -27,6 +27,8 @@ public class BaseTest {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--incognito");
+        options.addArguments("--disable-popups");
+        options.addArguments("--disable-notifications");
 
         driver = new ChromeDriver(options);
         driver.manage().window().maximize();
