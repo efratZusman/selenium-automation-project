@@ -1,5 +1,6 @@
 package utils;
 
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import java.io.*;
 import java.util.*;
@@ -12,7 +13,6 @@ public class ExcelWriter {
             double expectedTotal,
             double actualTotal,
             String finalStatus
-//            String finalScreenshot
     ) throws IOException {
 
         File file = new File(filePath);
@@ -33,59 +33,98 @@ public class ExcelWriter {
         try (XSSFWorkbook workbook = new XSSFWorkbook();
              FileOutputStream fos = new FileOutputStream(file)) {
 
-            XSSFSheet sheet = workbook.createSheet("CartResults");
+            // ==============================
+            // Styles
+            CellStyle headerStyle = createHeaderStyle(workbook);
+            CellStyle passStyle = createStatusStyle(workbook, IndexedColors.LIGHT_GREEN);
+            CellStyle failStyle = createStatusStyle(workbook, IndexedColors.ROSE);
 
-            // =======================
-            // כותרות מוצרים
-            String[] productHeaders = {
-                    "ProductName", "UnitPrice", "Quantity", "RowPrice", "Status", "Screenshot"
+            // ==============================
+            // Sheet 1: Product Results
+            XSSFSheet sheet = workbook.createSheet("Cart Results");
+
+            String[] headers = {
+                    "Product Name", "Unit Price", "Quantity", "Row Price", "Status"
             };
 
             XSSFRow headerRow = sheet.createRow(0);
-            for (int i = 0; i < productHeaders.length; i++) {
-                headerRow.createCell(i).setCellValue(productHeaders[i]);
+            for (int i = 0; i < headers.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(headers[i]);
+                cell.setCellStyle(headerStyle);
             }
 
-            // =======================
-            // שורות מוצרים
             int rowIndex = 1;
             for (Map<String, String> map : productRows) {
                 XSSFRow row = sheet.createRow(rowIndex++);
+
                 row.createCell(0).setCellValue(map.getOrDefault("ProductName", ""));
                 row.createCell(1).setCellValue(map.getOrDefault("UnitPrice", ""));
                 row.createCell(2).setCellValue(map.getOrDefault("Quantity", ""));
                 row.createCell(3).setCellValue(map.getOrDefault("RowPrice", ""));
-                row.createCell(4).setCellValue(map.getOrDefault("Status", ""));
-//                row.createCell(5).setCellValue(map.getOrDefault("Screenshot", ""));
+
+                Cell statusCell = row.createCell(4);
+                String status = map.getOrDefault("Status", "");
+                statusCell.setCellValue(status);
+                statusCell.setCellStyle(
+                        status.equalsIgnoreCase("PASS") ? passStyle : failStyle
+                );
             }
 
-            // =======================
-            // שורת רווח
-            rowIndex++;
-
-            // =======================
-            // כותרות סיכום
-            XSSFRow summaryHeader = sheet.createRow(rowIndex++);
-            summaryHeader.createCell(0).setCellValue("ExpectedTotal");
-            summaryHeader.createCell(1).setCellValue("ActualTotal");
-            summaryHeader.createCell(2).setCellValue("FinalStatus");
-//            summaryHeader.createCell(3).setCellValue("FinalScreenshot");
-
-            // =======================
-            // נתוני סיכום
-            XSSFRow summaryRow = sheet.createRow(rowIndex);
-            summaryRow.createCell(0).setCellValue(expectedTotal);
-            summaryRow.createCell(1).setCellValue(actualTotal);
-            summaryRow.createCell(2).setCellValue(finalStatus);
-//            summaryRow.createCell(3).setCellValue(finalScreenshot);
-
-            // =======================
-            // התאמת רוחב עמודות
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < headers.length; i++) {
                 sheet.autoSizeColumn(i);
             }
 
+            // ==============================
+            // Sheet 2: Summary
+            XSSFSheet summarySheet = workbook.createSheet("Summary");
+
+            XSSFRow summaryHeader = summarySheet.createRow(0);
+            summaryHeader.createCell(0).setCellValue("Expected Total");
+            summaryHeader.createCell(1).setCellValue("Actual Total");
+            summaryHeader.createCell(2).setCellValue("Final Status");
+
+            for (int i = 0; i < 3; i++) {
+                summaryHeader.getCell(i).setCellStyle(headerStyle);
+            }
+
+            XSSFRow summaryRow = summarySheet.createRow(1);
+            summaryRow.createCell(0).setCellValue(expectedTotal);
+            summaryRow.createCell(1).setCellValue(actualTotal);
+
+            Cell finalStatusCell = summaryRow.createCell(2);
+            finalStatusCell.setCellValue(finalStatus);
+            finalStatusCell.setCellStyle(
+                    finalStatus.equalsIgnoreCase("PASS") ? passStyle : failStyle
+            );
+
+            summarySheet.autoSizeColumn(0);
+            summarySheet.autoSizeColumn(1);
+            summarySheet.autoSizeColumn(2);
+
             workbook.write(fos);
         }
+    }
+
+    // ==============================
+    // Styles Helpers
+
+    private static CellStyle createHeaderStyle(XSSFWorkbook workbook) {
+        CellStyle style = workbook.createCellStyle();
+        Font font = workbook.createFont();
+        font.setBold(true);
+        style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        return style;
+    }
+
+    private static CellStyle createStatusStyle(XSSFWorkbook workbook, IndexedColors color) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFillForegroundColor(color.getIndex());
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setBorderBottom(BorderStyle.THIN);
+        return style;
     }
 }
